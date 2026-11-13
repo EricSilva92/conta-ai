@@ -14,7 +14,7 @@ import { sendClientMessage } from "@/lib/chat.functions";
 import { isAdmin } from "@/lib/auth-helpers";
 
 export const Route = createFileRoute("/_authenticated/minha-conta")({
-  head: () => ({ meta: [{ title: "Meu atendimento — Conta AI" }, { name: "description", content: "Converse com a assistente Conta AI." }] }),
+  head: () => ({ meta: [{ title: "Meu atendimento — Conta AI" }, { name: "description", content: "Converse com a assistente Conta AI." }, { property: "og:title", content: "Meu atendimento — Conta AI" }, { property: "og:description", content: "Converse com a assistente Conta AI." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: MinhaConta,
 });
 

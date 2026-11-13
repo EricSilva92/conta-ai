@@ -5,7 +5,9 @@ import type { Msg } from "./useMessages";
 
 export function Timeline({ messages, clientName, typing }: { messages: Msg[]; clientName: string; typing?: boolean }) {
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: "smooth" }), [messages.length, typing]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, typing]);
   return (
     <div className="flex-1 space-y-6 overflow-y-auto px-7 py-5">
       <div className="flex items-center gap-4 text-sm text-muted-foreground">

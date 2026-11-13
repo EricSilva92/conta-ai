@@ -12,7 +12,7 @@ import { isAdmin, initials, timeAgo } from "@/lib/auth-helpers";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/painel")({
-  head: () => ({ meta: [{ title: "Painel — Conta AI" }, { name: "description", content: "Painel administrativo do Conta AI." }] }),
+  head: () => ({ meta: [{ title: "Painel — Conta AI" }, { name: "description", content: "Painel administrativo do Conta AI." }, { property: "og:title", content: "Painel — Conta AI" }, { property: "og:description", content: "Painel administrativo do Conta AI." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Painel,
 });
 
