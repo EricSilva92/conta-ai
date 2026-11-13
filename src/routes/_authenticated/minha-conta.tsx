@@ -28,7 +28,9 @@ function MinhaConta() {
   const [typing, setTyping] = useState(false);
 
   useEffect(() => {
-    isAdmin(user.id).then((a) => a && navigate({ to: "/painel" }));
+    isAdmin(user.id).then((a) => {
+      if (a) navigate({ to: "/painel" });
+    });
     supabase.from("profiles").select("full_name").eq("id", user.id).single().then(({ data }) => setName(data?.full_name ?? ""));
   }, [user.id, navigate]);
 

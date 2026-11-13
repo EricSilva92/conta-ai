@@ -49,7 +49,7 @@ function Painel() {
   }
 
   useEffect(() => {
-    if (!allowed) return;
+    if (!allowed) return undefined;
     loadClients();
     const ch = supabase
       .channel(`profiles-${Math.random().toString(36).slice(2)}`)
@@ -126,7 +126,7 @@ function Painel() {
             </span>
             <span className="rounded-xl border border-primary/20 bg-secondary px-4 py-2 text-ink">Psicologia Financeira: Sim</span>
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-brand text-sm font-bold text-primary-foreground">
-              {initials((user.user_metadata?.full_name as string) || user.email || "Admin")}
+              {initials((user.user_metadata?.["full_name"] as string) || user.email || "Admin")}
             </span>
           </div>
         </header>

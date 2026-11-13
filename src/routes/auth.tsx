@@ -48,7 +48,10 @@ function AuthPage() {
       password: String(f.get("password")),
     });
     setLoading(false);
-    if (error) return toast.error("E-mail ou senha incorretos.");
+    if (error) {
+      toast.error("E-mail ou senha incorretos.");
+      return;
+    }
     await routeAfterLogin(data.user.id, adminMode);
   }
 
@@ -62,8 +65,14 @@ function AuthPage() {
       options: { emailRedirectTo: window.location.origin, data: { full_name: String(f.get("name")) } },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
-    if (data.session) return routeAfterLogin(data.user!.id, false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (data.session) {
+      await routeAfterLogin(data.user!.id, false);
+      return;
+    }
     toast.success("Conta criada! Confira seu e-mail para confirmar o cadastro.");
   }
 
