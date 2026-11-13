@@ -67,7 +67,7 @@ function Painel() {
   async function toggleControl() {
     if (!current) return;
     const { error } = await supabase.from("profiles").update({ ai_enabled: !current.ai_enabled }).eq("id", current.id);
-    if (error) return toast.error("Não foi possível alterar o modo de atendimento.");
+    if (error) { toast.error("Não foi possível alterar o modo de atendimento."); return; }
     setClients((cs) => cs.map((c) => (c.id === current.id ? { ...c, ai_enabled: !c.ai_enabled } : c)));
     toast.success(current.ai_enabled ? "Você assumiu o atendimento." : "A IA voltou a atender.");
   }
