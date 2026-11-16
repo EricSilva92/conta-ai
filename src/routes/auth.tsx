@@ -36,7 +36,7 @@ function AuthPage() {
       toast.error("Esta conta não tem acesso administrativo.");
       return;
     }
-    navigate({ to: admin ? "/painel" : "/minha-conta" });
+    navigate({ to: admin ? "/painel_administrativo" : "/minha-conta" });
   }
 
   async function signIn(e: React.FormEvent<HTMLFormElement>, adminMode: boolean) {
@@ -62,7 +62,10 @@ function AuthPage() {
     const { data, error } = await supabase.auth.signUp({
       email: String(f.get("email")),
       password: String(f.get("password")),
-      options: { emailRedirectTo: window.location.origin, data: { full_name: String(f.get("name")) } },
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: { full_name: String(f.get("name")) },
+      },
     });
     setLoading(false);
     if (error) {
@@ -77,8 +80,13 @@ function AuthPage() {
   }
 
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (r.error) { toast.error("Não foi possível entrar com Google."); return; }
+    const r = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin + "/auth",
+    });
+    if (r.error) {
+      toast.error("Não foi possível entrar com Google.");
+      return;
+    }
     if (r.redirected) return;
     const { data } = await supabase.auth.getUser();
     if (data.user) await routeAfterLogin(data.user.id, false);
@@ -105,7 +113,9 @@ function AuthPage() {
             <form onSubmit={(e) => signIn(e, false)} className="space-y-4">
               <Field name="email" label="E-mail" type="email" />
               <Field name="password" label="Senha" type="password" />
-              <Button disabled={loading} className="w-full rounded-full">Entrar</Button>
+              <Button disabled={loading} className="w-full rounded-full">
+                Entrar
+              </Button>
             </form>
             {GoogleBtn}
           </TabsContent>
@@ -115,12 +125,21 @@ function AuthPage() {
               <Field name="name" label="Nome completo" />
               <Field name="email" label="E-mail" type="email" />
               <Field name="password" label="Senha (mín. 6 caracteres)" type="password" />
-              <Button disabled={loading} className="w-full rounded-full">Criar conta</Button>
+              <Button disabled={loading} className="w-full rounded-full">
+                Criar conta
+              </Button>
             </form>
             {GoogleBtn}
             <p className="text-center text-xs text-muted-foreground">
-              Ao criar a conta, você concorda com os <Link to="/termos" className="underline">Termos</Link> e a{" "}
-              <Link to="/privacidade" className="underline">Privacidade</Link>.
+              Ao criar a conta, você concorda com os{" "}
+              <Link to="/termos" className="underline">
+                Termos
+              </Link>{" "}
+              e a{" "}
+              <Link to="/privacidade" className="underline">
+                Privacidade
+              </Link>
+              .
             </p>
           </TabsContent>
 
@@ -131,12 +150,16 @@ function AuthPage() {
             <form onSubmit={(e) => signIn(e, true)} className="space-y-4">
               <Field name="email" label="E-mail administrativo" type="email" />
               <Field name="password" label="Senha" type="password" />
-              <Button disabled={loading} className="w-full rounded-full">Entrar como Admin</Button>
+              <Button disabled={loading} className="w-full rounded-full">
+                Entrar como Admin
+              </Button>
             </form>
           </TabsContent>
         </Tabs>
       </div>
-      <Link to="/" className="mt-6 text-sm text-muted-foreground hover:text-foreground">← Voltar ao site</Link>
+      <Link to="/" className="mt-6 text-sm text-muted-foreground hover:text-foreground">
+        ← Voltar ao site
+      </Link>
     </div>
   );
 }
@@ -145,7 +168,14 @@ function Field({ name, label, type = "text" }: { name: string; label: string; ty
   return (
     <div className="space-y-1.5">
       <Label htmlFor={name}>{label}</Label>
-      <Input id={name} name={name} type={type} required minLength={type === "password" ? 6 : undefined} className="h-11 rounded-xl" />
+      <Input
+        id={name}
+        name={name}
+        type={type}
+        required
+        minLength={type === "password" ? 6 : undefined}
+        className="h-11 rounded-xl"
+      />
     </div>
   );
 }

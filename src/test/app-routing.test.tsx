@@ -14,4 +14,13 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("matches the administrative panel and keeps the previous route available", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+
+    expect(router.matchRoutes("/painel_administrativo").at(-1)?.routeId).toBe(
+      "/_authenticated/painel_administrativo",
+    );
+    expect(router.matchRoutes("/painel").at(-1)?.routeId).toBe("/_authenticated/painel");
+  });
 });

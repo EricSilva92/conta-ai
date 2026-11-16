@@ -28,7 +28,8 @@ async function generateReply(history: { role: "user" | "assistant"; content: str
   if (!res.ok || !res.body) {
     const body = await res.text().catch(() => "");
     console.error(`AI gateway failed [${res.status}]: ${body}`);
-    if (res.status === 429) throw new Error("Muitas mensagens agora. Tente novamente em instantes.");
+    if (res.status === 429)
+      throw new Error("Muitas mensagens agora. Tente novamente em instantes.");
     if (res.status === 402) throw new Error("Créditos de IA esgotados.");
     throw new Error("A assistente não conseguiu responder agora.");
   }
@@ -48,7 +49,8 @@ async function generateReply(history: { role: "user" | "assistant"; content: str
       if (!payload || payload === "[DONE]") continue;
       try {
         const evt = JSON.parse(payload);
-        if (evt.type === "response.output_text.delta" && typeof evt.delta === "string") text += evt.delta;
+        if (evt.type === "response.output_text.delta" && typeof evt.delta === "string")
+          text += evt.delta;
       } catch {
         /* partial */
       }
@@ -66,19 +68,32 @@ export const sendClientMessage = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("messages").insert({ client_id: userId, sender: "client", content: data.content });
-    if (error) throw new Error(error.message);
-    await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
+    const { error: activityError } = await supabase
+      .from("profiles")
+      .update({ last_seen_at: new Date().toISOString() })
+      .eq("id", userId);
+    if (activityError) throw new Error("Não foi possível atualizar sua atividade.");
 
-    const { data: profile } = await supabase.from("profiles").select("ai_enabled").eq("id", userId).single();
+    const { error } = await supabase
+      .from("messages")
+      .insert({ client_id: userId, sender: "client", content: data.content });
+    if (error) throw new Error(error.message);
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("ai_enabled")
+      .eq("id", userId)
+      .single();
+    if (profileError) throw new Error("Não foi possível verificar o atendimento.");
     if (!profile?.ai_enabled) return { replied: false };
 
-    const { data: msgs } = await supabase
+    const { data: msgs, error: messagesError } = await supabase
       .from("messages")
       .select("sender, content")
       .eq("client_id", userId)
       .order("created_at", { ascending: false })
       .limit(20);
+    if (messagesError) throw new Error("Não foi possível carregar o histórico da conversa.");
     const history = (msgs ?? []).reverse().map((m) => ({
       role: (m.sender === "client" ? "user" : "assistant") as "user" | "assistant",
       content: m.content,
@@ -86,6 +101,11 @@ export const sendClientMessage = createServerFn({ method: "POST" })
     const reply = await generateReply(history);
     if (!reply) return { replied: false };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("messages").insert({ client_id: userId, sender: "ai", content: reply });
-    return { replied: true };
+    const { data: savedMessage, error: saveError } = await supabaseAdmin
+      .from("messages")
+      .insert({ client_id: userId, sender: "ai", content: reply })
+      .select("id")
+      .maybeSingle();
+    if (saveError) throw new Error("Não foi possível salvar a resposta da assistente.");
+    return { replied: savedMessage !== null };
   });

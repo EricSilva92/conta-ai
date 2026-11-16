@@ -14,7 +14,16 @@ import { sendClientMessage } from "@/lib/chat.functions";
 import { isAdmin } from "@/lib/auth-helpers";
 
 export const Route = createFileRoute("/_authenticated/minha-conta")({
-  head: () => ({ meta: [{ title: "Meu atendimento — Conta AI" }, { name: "description", content: "Converse com a assistente Conta AI." }, { property: "og:title", content: "Meu atendimento — Conta AI" }, { property: "og:description", content: "Converse com a assistente Conta AI." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Meu atendimento — Conta AI" },
+      { name: "description", content: "Converse com a assistente Conta AI." },
+      { property: "og:title", content: "Meu atendimento — Conta AI" },
+      { property: "og:description", content: "Converse com a assistente Conta AI." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: MinhaConta,
 });
 
@@ -29,9 +38,14 @@ function MinhaConta() {
 
   useEffect(() => {
     isAdmin(user.id).then((a) => {
-      if (a) navigate({ to: "/painel" });
+      if (a) navigate({ to: "/painel_administrativo" });
     });
-    supabase.from("profiles").select("full_name").eq("id", user.id).single().then(({ data }) => setName(data?.full_name ?? ""));
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => setName(data?.full_name ?? ""));
   }, [user.id, navigate]);
 
   async function logout() {
@@ -45,12 +59,18 @@ function MinhaConta() {
     <div className="mx-auto flex h-screen max-w-4xl flex-col gap-5 p-5">
       <header className="card-panel flex items-center justify-between px-6 py-4">
         <Brand size="sm" />
-        <Button variant="ghost" onClick={logout}><LogOut className="mr-2 h-4 w-4" /> Sair</Button>
+        <Button variant="ghost" onClick={logout}>
+          <LogOut className="mr-2 h-4 w-4" /> Sair
+        </Button>
       </header>
       <section className="card-panel flex min-h-0 flex-1 flex-col">
         <div className="border-b border-border px-7 py-5">
-          <h1 className="text-2xl font-bold text-ink">Olá{name ? `, ${name.split(" ")[0]}` : ""}!</h1>
-          <p className="text-sm text-muted-foreground">Conte como está sua relação com o dinheiro hoje.</p>
+          <h1 className="text-2xl font-bold text-ink">
+            Olá{name ? `, ${name.split(" ")[0]}` : ""}!
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Conte como está sua relação com o dinheiro hoje.
+          </p>
         </div>
         <Timeline messages={messages} clientName={name || "Você"} typing={typing} />
         <Composer
