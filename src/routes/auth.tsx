@@ -63,7 +63,7 @@ function AuthPage() {
       email: String(f.get("email")),
       password: String(f.get("password")),
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/auth`,
         data: { full_name: String(f.get("name")) },
       },
     });

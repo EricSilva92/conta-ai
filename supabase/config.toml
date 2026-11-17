@@ -1,1 +1,8 @@
 project_id = "ncgelubtbvqaxmogblgs"
+
+[auth]
+site_url = "https://finstress.netlify.app"
+additional_redirect_urls = [
+  "https://finstress.netlify.app",
+  "https://finstress.netlify.app/auth",
+]
